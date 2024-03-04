@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Reader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #output {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mapa Reader</h1>
+    <input type="file" id="fileInput" accept=".txt">
+    <button onclick="processFile()">Processar Mapa</button>
+    <div id="output"></div>
+
+    <script>
+        function processFile() {
+            const fileInput = document.getElementById('fileInput');
+            const outputDiv = document.getElementById('output');
+
+            const file = fileInput.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function(event) {
+    const content = event.target.result;
+    const result = processMap(content);
+    outputDiv.innerText = 'Soma: ' + result.sum + '\nPilha: ' + result.stack.join(', ');
+};
+
+                reader.readAsText(file);
+            } else {
+                outputDiv.innerText = 'Selecione um arquivo TXT.';
+            }
+        }
+
+        function processMap(content) {
+            const lines = content.split('\n');
+            const dimensions = lines[0].split(' ');
+            const numRows = parseInt(dimensions[0]);
+            const numCols = parseInt(dimensions[1]);
+
+            let sum = 0;
+            let stack = [];
+            let start = false;
+            for (let i = 1; i <= numRows; i++) {
+                if (lines[i]) {
+                    if (!start && lines[i].indexOf('--') !== -1) {
+                        start = true;
+                    }
+                    if (start) {
+                        const row = lines[i].split(' ').map(Number);
+                        for (let j = 0; j < numCols; j++) {
+                            if (!isNaN(row[j])) {
+                                sum += row[j];
+                                if(row[j] > 0) {
+                                stack.push(row[j]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return { sum, stack };
+        }
+
+
+    </script>
+</body>
+</html>
